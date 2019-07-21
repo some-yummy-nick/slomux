@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,sBACE,mBACF","file":"main.e4679912.chunk.css","sourcesContent":[".button-start.disable{\n  pointer-events:none;\n}\n"]}
