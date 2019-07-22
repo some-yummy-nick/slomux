@@ -79,18 +79,11 @@ const changeInterval = value => ({
 const reducer = (state, action) => {
     switch (action.type) {
         case CHANGE_INTERVAL:
-            if (state.currentInterval <= 0) {
-                return {
-                    ...state,
-                    currentInterval: 1
-                }
-            } else {
-                return {
-                    ...state,
-                    currentInterval: state.currentInterval + action.payload
-                };
-            }
 
+            return {
+                ...state,
+                currentInterval: Math.max(1, state.currentInterval + action.payload)
+            };
 
         default:
             return state;
