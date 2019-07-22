@@ -17,11 +17,11 @@ const createStore = (reducer, initialState) => {
 
     const subscribe = listener => listeners.push(listener);
 
-    return { getState, dispatch, subscribe };
+    return {getState, dispatch, subscribe};
 };
 
 const connect = (mapStateToProps, mapDispatchToProps) => Component => {
-    class WrappedComponent extends React.Component {
+    class WrappedComponent extends React.PureComponent {
         componentDidMount() {
             this.context.store.subscribe(this.handleChange);
         }
@@ -48,7 +48,7 @@ const connect = (mapStateToProps, mapDispatchToProps) => Component => {
     return WrappedComponent;
 };
 
-class Provider extends React.Component {
+class Provider extends React.PureComponent {
     getChildContext() {
         return {
             store: this.props.store
@@ -79,18 +79,27 @@ const changeInterval = value => ({
 const reducer = (state, action) => {
     switch (action.type) {
         case CHANGE_INTERVAL:
-            return {
-                ...state,
-                currentInterval: state.currentInterval + action.payload
-            };
+            if (state.currentInterval <= 0) {
+                return {
+                    ...state,
+                    currentInterval: 1
+                }
+            } else {
+                return {
+                    ...state,
+                    currentInterval: state.currentInterval + action.payload
+                };
+            }
+
+
         default:
-            return {};
+            return state;
     }
 };
 
 // components
 
-class IntervalComponent extends React.Component {
+class IntervalComponent extends React.PureComponent {
     render() {
         return (
             <div>
@@ -120,12 +129,13 @@ class TimerComponent extends React.Component {
         super();
         this.startButton = React.createRef();
     }
+
     state = {
         currentTime: 0
     };
 
     handleStart = () => {
-        const { currentInterval } = this.props;
+        const {currentInterval} = this.props;
         const startButton = this.startButton.current;
         startButton.classList.add("disable");
         this.setState({
@@ -137,20 +147,20 @@ class TimerComponent extends React.Component {
             }));
         };
 
-        int = setInterval(changeCurrentTime.bind(this), currentInterval * 1000);
+        int = setInterval(changeCurrentTime, currentInterval * 1000);
     };
 
     handleStop = () => {
         const startButton = this.startButton.current;
         startButton.classList.remove("disable");
         clearInterval(int);
-        this.setState({ currentTime: 0 });
+        this.setState({currentTime: 0});
     };
 
     render() {
         return (
             <div>
-                <Interval />
+                <Interval/>
                 <div>Секундомер: {this.state.currentTime} сек.</div>
                 <div>
                     <button
@@ -171,7 +181,8 @@ const Timer = connect(
     state => ({
         currentInterval: state.currentInterval
     }),
-    () => {}
+    () => {
+    }
 )(TimerComponent);
 
 const initialState = {
@@ -181,7 +192,7 @@ const initialState = {
 // init
 ReactDOM.render(
     <Provider store={createStore(reducer, initialState)}>
-        <Timer />
+        <Timer/>
     </Provider>,
     document.getElementById("root")
 );
